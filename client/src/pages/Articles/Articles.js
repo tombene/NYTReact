@@ -7,48 +7,51 @@ import { Col, Row, Container } from "../../components/Grid";
 import { List, ListItem } from "../../components/List";
 import { Input, TextArea, FormBtn } from "../../components/Form";
 
-class Books extends Component {
+class Articles extends Component {
   state = {
-    books: [],
+    articles: [],
     title: "",
-    author: "",
-    synopsis: ""
+    date: "",
+    url	: ""
   };
 
+	//Life cycle
   componentDidMount() {
-    this.loadBooks();
+    this.loadArticles();
   }
 
-  loadBooks = () => {
-    API.getBooks()
+  loadArticles = () => {
+    API.getArticles()
       .then(res =>
-        this.setState({ books: res.data, title: "", author: "", synopsis: "" })
+        this.setState({ articles: res.data, title: "", date: "", url: "" })
       )
       .catch(err => console.log(err));
   };
 
-  deleteBook = id => {
-    API.deleteBook(id)
-      .then(res => this.loadBooks())
+  deleteAtricle = id => {
+    API.deleteAtricle(id)
+      .then(res => this.loadArticles())
       .catch(err => console.log(err));
   };
 
   handleInputChange = event => {
-    const { name, value } = event.target;
+		const { name, value } = event.target;
+		//this.setState funcion will rerender the state
     this.setState({
+			//grab the property that has the name of name and get its value
       [name]: value
     });
   };
 
   handleFormSubmit = event => {
     event.preventDefault();
-    if (this.state.title && this.state.author) {
-      API.saveBook({
+    if (this.state.title && this.state.date && this.state.url) {
+      API.saveArticle({
         title: this.state.title,
-        author: this.state.author,
-        synopsis: this.state.synopsis
+        date: this.state.date,
+        url: this.state.url
       })
-        .then(res => this.loadBooks())
+        .then(res => this.loadArticles())
         .catch(err => console.log(err));
     }
   };
@@ -59,7 +62,8 @@ class Books extends Component {
         <Row>
           <Col size="md-6">
             <Jumbotron>
-              <h1>What Books Should I Read?</h1>
+              <h1>New York Times Article Scrubber</h1>
+							<h2>Search for and annotate articles of interest!</h2>
             </Jumbotron>
             <form>
               <Input
@@ -69,39 +73,39 @@ class Books extends Component {
                 placeholder="Title (required)"
               />
               <Input
-                value={this.state.author}
+                value={this.state.date}
                 onChange={this.handleInputChange}
-                name="author"
-                placeholder="Author (required)"
+                name="date"
+                placeholder="Date (required)"
               />
               <TextArea
                 value={this.state.synopsis}
                 onChange={this.handleInputChange}
-                name="synopsis"
-                placeholder="Synopsis (Optional)"
+                name="url"
+                placeholder="Url (Required)"
               />
               <FormBtn
-                disabled={!(this.state.author && this.state.title)}
+                disabled={!(this.state.date && this.state.title && this.state.url)}
                 onClick={this.handleFormSubmit}
               >
-                Submit Book
+                Submit Atricle
               </FormBtn>
             </form>
           </Col>
           <Col size="md-6 sm-12">
             <Jumbotron>
-              <h1>Books On My List</h1>
+              <h1>Articles On My List</h1>
             </Jumbotron>
-            {this.state.books.length ? (
+            {this.state.articles.length ? (
               <List>
-                {this.state.books.map(book => (
-                  <ListItem key={book._id}>
-                    <Link to={"/books/" + book._id}>
+                {this.state.articles.map(article => (
+                  <ListItem key={article._id}>
+                    <Link to={"/articles/" + article._id}>
                       <strong>
-                        {book.title} by {book.author}
+                        {article.title} published {article.date}
                       </strong>
                     </Link>
-                    <DeleteBtn onClick={() => this.deleteBook(book._id)} />
+                    <DeleteBtn onClick={() => this.deleteAtricle(article._id)} />
                   </ListItem>
                 ))}
               </List>
@@ -115,4 +119,4 @@ class Books extends Component {
   }
 }
 
-export default Books;
+export default Articles;
